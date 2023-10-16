@@ -135,7 +135,7 @@ right_frame = ttk.Frame(root)
 right_frame.grid(row=0, column=1, sticky="nsew")
 
 # Add content to the right side
-right_label = ttk.Label(right_frame, text="Currently Playing:")
+right_label = ttk.Label(right_frame, text="Currently Playing:",  font=("Arial", 16))
 right_label.pack()
 
 # Configure grid weights to allow resizing
