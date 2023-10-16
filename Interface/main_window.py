@@ -7,17 +7,19 @@ def on_configure(event):
     canvas.configure(scrollregion=canvas.bbox("all"))
 
 def on_mousewheel(event):
-    current_position = canvas.yview()
-    if event.delta > 0 and current_position != (0.0, 0.0):
-        # Scroll up only if not already at the top
-        canvas.yview_scroll(-1 * (event.delta // 120), "units")
-    elif event.delta < 0 and current_position != (1.0, 1.0):
-        # Scroll down only if not already at the bottom
-        canvas.yview_scroll(-1 * (event.delta // 120), "units")
+    canvas.yview_scroll(-1 * (event.delta // 120), "units")
 
-def button_action():
-    # Define the action to perform when the button is clicked
-    print("Button Clicked")
+def on_image_enter(event):
+    # Change the cursor to a pointing hand when hovering over an image
+    content_frame.config(cursor="hand2")
+
+def on_image_leave(event):
+    # Restore the default cursor when the mouse leaves the image
+    content_frame.config(cursor="")
+
+def button_action(title):
+    # Define the action to perform when the image is clicked
+    print(f"Image Clicked: {title}")
 
 root = tk.Tk()
 root.title("Video Player")
@@ -54,18 +56,79 @@ canvas.create_window((0, 0), window=content_frame, anchor="nw")
 
 root.bind("<MouseWheel>", on_mousewheel)
 
-# Load the image with Pillow and create an ImageTk PhotoImage
-image = Image.open("Interface/army.gif")  # Open the image
-image = image.resize((300, 300))  # Resize the image
-photo = ImageTk.PhotoImage(image)  # Create an ImageTk PhotoImage
+# List of image paths to use as placeholders
+image_data = [
+    {
+        "image_path": "Interface/army.gif",
+        "title": "Image 1 Title",
+    },
+    {
+        "image_path": "Interface/mordo.jpg",
+        "title": "Image 2 Title",
+    },
+    {
+        "image_path": "Interface/army.gif",
+        "title": "Image 3 Title",
+    },
+    {
+        "image_path": "Interface/mordo.jpg",
+        "title": "Image 4 Title",
+    },
+    {
+        "image_path": "Interface/army.gif",
+        "title": "Image 5 Title",
+    },
+    {
+        "image_path": "Interface/mordo.jpg",
+        "title": "Image 6 Title",
+    },
+    {
+        "image_path": "Interface/army.gif",
+        "title": "Image 7 Title",
+    },
+        {
+        "image_path": "Interface/mordo.jpg",
+        "title": "Image 8 Title",
+    },
+    {
+        "image_path": "Interface/army.gif",
+        "title": "Image 9 Title",
+    },
+    {
+        "image_path": "Interface/mordo.jpg",
+        "title": "Image 10 Title",
+    },
+    {
+        "image_path": "Interface/army.gif",
+        "title": "Image 11 Title",
+    },
+        {
+        "image_path": "Interface/mordo.jpg",
+        "title": "Image 12 Title",
+    }, 
+]
 
-# Create a Label to display the resized image as a button
-button_label = ttk.Label(content_frame, image=photo)
-button_label.image = photo  # Keep a reference to prevent it from being garbage collected
-button_label.pack()
+style = ttk.Style()
+style.configure("ImageTitle.TLabel", font=("Times New Roman", 16), foreground="black")
 
-# Bind the button action to the label
-button_label.bind("<Button-1>", lambda event: button_action())
+
+
+# Load and add images with titles from the list to the content frame
+for i, data in enumerate(image_data):
+    image = Image.open(data["image_path"])
+    image = image.resize((300, 200))
+    photo = ImageTk.PhotoImage(image)
+    button_label = ttk.Label(content_frame, image=photo)
+    button_label.image = photo
+    button_label.grid(row=i, column=0, padx=20, pady=20)  # Place image in the first column
+
+    title_label = ttk.Label(content_frame, text=data["title"], style="ImageTitle.TLabel")
+    title_label.grid(row=i, column=1, sticky="w")  # Place title in the second column to the right
+
+    # Bind events for cursor change and action
+    button_label.bind("<Enter>", on_image_enter)
+    button_label.bind("<Leave>", on_image_leave)
+    button_label.bind("<Button-1>", lambda event, title=data["title"]: button_action(title))
 
 # Create a Frame for the right side (3/4 of the window)
 right_frame = ttk.Frame(root)
@@ -78,6 +141,6 @@ right_label.pack()
 # Configure grid weights to allow resizing
 root.grid_rowconfigure(0, weight=1)
 root.grid_columnconfigure(0, weight=1)
-root.grid_columnconfigure(1, weight=3)
+root.grid_columnconfigure(1, weight=4)
 
 root.mainloop()
