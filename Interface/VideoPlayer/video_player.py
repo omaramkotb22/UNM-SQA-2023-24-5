@@ -14,21 +14,19 @@ class YoutubePlayer(QMainWindow):
         self.layout = QVBoxLayout()
         self.central_widget.setLayout(self.layout)
 
-        self.url_input = QLineEdit()
-        self.layout.addWidget(self.url_input)
 
-        self.play_button = QPushButton("Play")
-        self.play_button.clicked.connect(self.play_video)
-        self.layout.addWidget(self.play_button)
 
         self.web_view = QWebEngineView()
         self.layout.addWidget(self.web_view)
+        
+#        self.play_video("VIDEO_ID_GOES_HERE") # calls the play video function with the video id
 
-    def play_video(self):
-        video_id = self.url_input.text()
+    def play_video(self, video_id):
         embed_code = f'<iframe width="560" height="315" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen></iframe>'
         self.web_view.setHtml(embed_code)
 
+
+# To start the window, may not be needed while you embed it
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = YoutubePlayer()
