@@ -17,11 +17,9 @@ class Youtube:
         for search_result in search_response.get("items", []):
             video_id = search_result["id"]["videoId"]
             video_title = search_result["snippet"]["title"]
-            video_url = f"https://www.youtube.com/watch?v={video_id}"
-
             results.append({
                 "title": video_title,
-                "url": video_url
+                "id": video_id,
             })
 
         return results
