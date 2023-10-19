@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLi
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 class YoutubePlayer(QMainWindow):
-    def __init__(self):
+    def __init__(self, video_id):
         super().__init__()
         self.setWindowTitle("YouTube Video Player")
         self.setGeometry(100, 100, 800, 600)
@@ -19,7 +19,7 @@ class YoutubePlayer(QMainWindow):
         self.web_view = QWebEngineView()
         self.layout.addWidget(self.web_view)
         
-#        self.play_video("VIDEO_ID_GOES_HERE") # calls the play video function with the video id
+        self.play_video(video_id)
 
     def play_video(self, video_id):
         embed_code = f'<iframe width="560" height="315" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen></iframe>'
