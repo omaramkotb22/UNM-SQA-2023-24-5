@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/Users/yenzinhlabatsi/Documents/UNM-SQA-2023-24---5-1/Interface')  #append path to include GUI
+import main_window
 import googleapiclient.discovery
 
 
@@ -18,6 +21,8 @@ def search_youtube_videos(api_key, query, num_results=5):
         video_id = search_result["id"]["videoId"]
         video_title = search_result["snippet"]["title"]
         video_url = f"https://www.youtube.com/watch?v={video_id}"
+        
+        main_window.videos_list.append(main_window.Video("Interface/mordo.jpg", video_title, video_url))
 
         print(f"Result #{idx}:")
         print(f"Title: {video_title}")
