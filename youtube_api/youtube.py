@@ -1,43 +1,29 @@
-import sys
-sys.path.append('/Users/yenzinhlabatsi/Documents/UNM-SQA-2023-24---5-1/Interface')  #append path to include GUI
-import main_window
 import googleapiclient.discovery
 
+class Video:
+    def __init__(self, image_path, title, video_id):
+        self.image_path = image_path
+        self.title = title
+        self.video_id = video_id
 
-def search_youtube_videos(api_key, query, num_results=5):
-    # Create a YouTube Data API client
-    youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
+class Youtube:
+    def __init__(self, api_key="AIzaSyD6Wp2WzfDrSnnpOq-Mxb2m3QDFfisBlqY"):
+        self.api_key = api_key
+        self.youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
 
-    # Perform the search request, specifying type=video
-    search_response = youtube.search().list(
-        q=query,
-        part="id,snippet",
-        maxResults=num_results,
-        type="video"
-    ).execute()
+    def search(self, query="Software Quality Assurance", num_results=12):
+        search_response = self.youtube.search().list(
+            q=query,
+            part="id,snippet",
+            maxResults=num_results,
+            type="video"
+        ).execute()
 
-    # Process and display the search results
-    for idx, search_result in enumerate(search_response.get("items", []), start=1):
-        video_id = search_result["id"]["videoId"]
-        video_title = search_result["snippet"]["title"]
-        video_url = f"https://www.youtube.com/watch?v={video_id}"
-        
-        main_window.videos_list.append(main_window.Video("Interface/mordo.jpg", video_title, video_url))
-
-        print(f"Result #{idx}:")
-        print(f"Title: {video_title}")
-        print(f"Video URL: {video_url}")
-        print("\n")
-
-
-if __name__ == "__main__":
-    # Replace 'YOUR_API_KEY' with your actual YouTube Data API key
-    api_key = "AIzaSyD6Wp2WzfDrSnnpOq-Mxb2m3QDFfisBlqY"
-
-    # Replace 'YOUR_SEARCH_QUERY' with the query you want to search for
-    search_query = "Software Quality Assurance"
-
-    # Specify the number of results you want (default is 5)
-    num_results = 12
-
-    search_youtube_videos(api_key, search_query, num_results)
+        results = []
+        for search_result in search_response.get("items", []):
+            video_id = search_result["id"]["videoId"]
+            video_title = search_result["snippet"]["title"]
+            video_image = search_result["snippet"]["thumbnails"]["high"]["url"]
+            video = Video(video_image, video_title, video_id)
+            results.append(video)
+        return results
