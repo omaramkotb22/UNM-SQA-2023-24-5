@@ -7,6 +7,9 @@ from PyQt5.QtGui import *
 
 from PyQt5.QtCore import *
 
+import pyperclip
+
+
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 import os
 import sys
@@ -35,7 +38,11 @@ youtube = youtube.Youtube()
 #         self.title = title
 
 #         self.video_id = video_id
-
+class Utils:
+    def copyURL(id):
+        url = f'https://www.youtube.com/watch?v={id}'
+        pyperclip.copy(url)
+        print("url copied to clipboard")
 
 
 class VideoEntry(QWidget):
@@ -190,26 +197,6 @@ class MainWindow(QMainWindow):
 
         left_layout.addWidget(scroll_area)
 
-
-        # right_widget.setStyleSheet("background-color: lightgray")
-
-
-        # right_label = QLabel("Currently Playing:", right_widget)
-
-        # right_label.setFont(QFont("Roboto", 20))
-
-        # right_layout = QVBoxLayout(right_widget)
-
-        # right_layout.addWidget(right_label, alignment=Qt.AlignTop | Qt.AlignHCenter)
-
-        # playArea = QWebEngineView()
-
-        # right_layout.addWidget(playArea)    #dedicated play area (initially blank)
-
-        # right_widget.setLayout(right_layout)
-        
-
-
         splitter.addWidget(left_widget)
 
         # splitter.addWidget(right_widget)
@@ -247,7 +234,7 @@ class MainWindow(QMainWindow):
             copy_button.setStyleSheet("background-color: lightblue")
             copy_button.resize(100,32)
             copy_button.move(900, 600)
-            copy_button.clicked.connect(self.copyURL(id))
+            copy_button.clicked.connect(Utils.copyURL(id))
 
             layout.addWidget(playArea)
 
@@ -256,7 +243,3 @@ class MainWindow(QMainWindow):
             popup.exec_()
             
 
-def copyURL(self, id):
-    url = f'https://www.youtube.com/watch?v={video.id}'
-    pyperclip.copy(url)
-    print("URL copied to clipboard")
