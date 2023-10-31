@@ -241,6 +241,13 @@ class MainWindow(QMainWindow):
             playArea = QWebEngineView()
 
             playArea.setHtml(embed_code)
+            
+            copy_button = QPushButton("Copy URL", self)
+            copy_button.setFont(QFont("Roboto", 12))
+            copy_button.setStyleSheet("background-color: lightblue")
+            copy_button.resize(100,32)
+            copy_button.move(900, 600)
+            copy_button.clicked.connect(self.copyURL(id))
 
             layout.addWidget(playArea)
 
@@ -249,3 +256,7 @@ class MainWindow(QMainWindow):
             popup.exec_()
             
 
+def copyURL(self, id):
+    url = f'https://www.youtube.com/watch?v={video.id}'
+    pyperclip.copy(url)
+    print("URL copied to clipboard")
