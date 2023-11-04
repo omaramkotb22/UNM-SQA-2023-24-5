@@ -38,11 +38,11 @@ youtube = youtube.Youtube()
 #         self.title = title
 
 #         self.video_id = video_id
-class Utils:
-    def copyURL(id):
-        url = f'https://www.youtube.com/watch?v={id}'
-        pyperclip.copy(url)
-        print("url copied to clipboard")
+
+def copyURL(id):
+    url = f'https://www.youtube.com/watch?v={id}'
+    pyperclip.copy(url)
+    print("url copied to clipboard")
 
 
 class VideoEntry(QWidget):
@@ -234,9 +234,10 @@ class MainWindow(QMainWindow):
             copy_button.setStyleSheet("background-color: lightblue")
             copy_button.resize(100,32)
             copy_button.move(900, 600)
-            copy_button.clicked.connect(Utils.copyURL(id))
+            copy_button.clicked.connect(lambda: copyURL(id))
 
             layout.addWidget(playArea)
+            layout.addWidget(copy_button)
 
             popup.setLayout(layout)
 
