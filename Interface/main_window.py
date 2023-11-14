@@ -87,6 +87,16 @@ class SplitWindow(QMainWindow):
             checkbox.stateChanged.connect(self.updateSelectedKeywords)
             self.predefined_checkboxes.append(checkbox)
             filter_layout.addWidget(checkbox)
+         
+        # Add QLineEdit for custom keyword entry    
+        self.custom_keyword_edit = QLineEdit()
+        self.custom_keyword_edit.setPlaceholderText("Enter custom keyword")
+        left_layout.addWidget(self.custom_keyword_edit)
+        
+        # Add a button to trigger the filtering process
+        filter_button = QPushButton("Filter Videos")
+        filter_button.clicked.connect(self.updateSelectedKeywords)
+        left_layout.addWidget(filter_button)
 
 
         left_layout.addWidget(title_label)
@@ -162,6 +172,12 @@ class SplitWindow(QMainWindow):
             if checkbox.isChecked():
                 self.selected_keywords.add(checkbox.text())
         self.applyKeywordFilter()
+        
+        # Add custom keyword to the set
+        custom_keyword = self.custom_keyword_edit.text().strip()
+        if custom_keyword:
+            self.selected_keywords.add(custom_keyword)
+            self.applyKeywordFilter()
 
     def applyKeywordFilter(self):
         selected_keywords = list(self.selected_keywords)  # Convert set to list
