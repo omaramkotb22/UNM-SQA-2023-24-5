@@ -122,28 +122,27 @@ class SplitWindow(QMainWindow):
         splitter2 = QSplitter(Qt.Horizontal)
         
         noteFrame = QFrame()
-        noteFrame.setWindowTitle("Notepad")
         self.noteLayout = QVBoxLayout(noteFrame)
-        label = QLabel("Notepad",noteFrame)
+        label = QLabel("Notepad")
         label.setFont(QFont("Roboto", 18))
         self.noteLayout.addWidget(label)
         
-        self.noteView = QScrollArea(noteFrame)
-        self.noteContainer = QWidget(self.noteView)
+        self.noteView = QScrollArea()
+        self.noteView.setWidgetResizable(True)
+        self.noteView.setFrameShape(QFrame.NoFrame)
+        self.noteView.setFrameShadow(QFrame.Plain)
+        self.noteContainer = QWidget()
         self.containerLayout = QVBoxLayout(self.noteContainer)
-        notes = self.checkDB(id)
-        self.notesDisplay(notes, False)
+        self.noteView.setWidget(self.noteContainer)
         self.noteLayout.addWidget(self.noteView)
+        self.notesDisplay(self.checkDB(id), False)
         
-        saveButton = QPushButton(noteFrame, text="Save")
-        self.noteLayout.addWidget(saveButton)
-        saveButton.clicked.connect(lambda: self.saveNote(id, saveButton))
+        self.saveButton = QPushButton(noteFrame, text="Save")
+        self.noteLayout.addWidget(self.saveButton)
+        self.saveButton.clicked.connect(lambda: self.saveNote(id, self.saveButton))
         addButton = QPushButton(noteFrame, text="Add Note")
-        addButton.clicked.connect(lambda: self.notesDisplay(notes, True))
+        addButton.clicked.connect(lambda: self.notesDisplay(self.checkDB(id), True))
         self.noteLayout.addWidget(addButton)
-        
-        
-        
         
         playArea = QWebEngineView()
         playArea.setHtml(embed_code)
@@ -190,7 +189,6 @@ class SplitWindow(QMainWindow):
         cursor.execute('select Note from Video_Notes where id = ?', (id,))
         result = cursor.fetchall()
         if result:
-            print(result)
             return result
          
     def saveNote(self, id, saveButton):
@@ -219,17 +217,18 @@ class SplitWindow(QMainWindow):
                     i += 1
                     
                 for x in notes:
-                    self.textArea = QTextEdit(self.noteContainer)
+                    self.textArea = QTextEdit()
                     self.textArea.lineWrapColumnOrWidth = 50
                     self.textArea.setText(x[0])
                     self.containerLayout.addWidget(self.textArea)
-            self.textArea = QTextEdit(self.noteContainer)
+            self.textArea = QTextEdit()
             self.textArea.lineWrapColumnOrWidth = 50
             self.containerLayout.addWidget(self.textArea)
+            self.saveButton.setText("Save")
         else:
             if notes:
                 for x in notes:
-                    self.textArea = QTextEdit(self.noteContainer)
+                    self.textArea = QTextEdit()
                     self.textArea.lineWrapColumnOrWidth = 50
                     self.textArea.setText(x[0])
                     self.containerLayout.addWidget(self.textArea)
