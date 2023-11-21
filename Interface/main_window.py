@@ -53,6 +53,7 @@ class SplitWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.custom_keyword_edit = QLineEdit()
         self.setWindowTitle("Video Player")
         self.setGeometry(100, 100, 1920, 1080)
 
@@ -79,11 +80,17 @@ class SplitWindow(QMainWindow):
 
         filter_frame = QFrame()
         filter_frame.setFrameShape(QFrame.StyledPanel)
-        filter_layout = QVBoxLayout(filter_frame)
+        self.filter_layout = QVBoxLayout(filter_frame)
 
         keyword_label = QLabel("Keywords")
         keyword_label.setFont(QFont("Roboto", 14))
-        filter_layout.addWidget(keyword_label)
+        self.filter_layout.addWidget(keyword_label)
+
+        self.filter_layout.addWidget(self.custom_keyword_edit)
+
+        add_keyword_button = QPushButton("Add Keyword")
+        add_keyword_button.clicked.connect(self.addCustomKeyword)
+        self.filter_layout.addWidget(add_keyword_button)
 
         self.predefined_keywords = ["explained", "tutorial", "demo"]
         self.predefined_checkboxes = []
@@ -93,21 +100,12 @@ class SplitWindow(QMainWindow):
             checkbox.setFont(QFont("Roboto", 12))
             checkbox.stateChanged.connect(self.updateSelectedKeywords)
             self.predefined_checkboxes.append(checkbox)
-            filter_layout.addWidget(checkbox)
+            self.filter_layout.addWidget(checkbox)
          
-        # Add QLineEdit for custom keyword entry    
-        self.custom_keyword_edit = QLineEdit()
-        self.custom_keyword_edit.setPlaceholderText("Enter custom keyword")
-        left_layout.addWidget(self.custom_keyword_edit)
-        
-        # Add a button to trigger the filtering process
-        filter_button = QPushButton("Filter Videos")
-        filter_button.clicked.connect(self.updateSelectedKeywords)
-        left_layout.addWidget(filter_button)
-
-
+       
         left_layout.addWidget(title_label)
         left_layout.addWidget(filter_frame)
+        
 
         line = QFrame()
         line.setFrameShape(QFrame.HLine)
@@ -128,6 +126,13 @@ class SplitWindow(QMainWindow):
         central_layout.addWidget(splitter)
 
         self.updateVideoList(youtube.search())
+
+    def addCustomKeyword(self):
+        custom_keyword = self.custom_keyword_edit.text().strip()
+        if custom_keyword:
+            # Add the custom keyword to the predefined list and create a new checkbox
+            self.predefined_keywords.append(custom_keyword)
+            self.addCheckboxForCustomKeyword(custom_keyword)
 
     # popup video player (appears when video in collection clicked)
     def playVideo(self, id):
@@ -181,24 +186,31 @@ class SplitWindow(QMainWindow):
     # filter video collection based on keywords
     def updateSelectedKeywords(self):
         self.selected_keywords.clear()
+
+        # Check predefined checkboxes
         for checkbox in self.predefined_checkboxes:
             if checkbox.isChecked():
                 self.selected_keywords.add(checkbox.text())
+        # Apply the keyword filter
         self.applyKeywordFilter()
-        
-        # Add custom keyword to the set
-        custom_keyword = self.custom_keyword_edit.text().strip()
-        if custom_keyword:
-            self.selected_keywords.add(custom_keyword)
-            self.applyKeywordFilter()
 
+    
+    def addCheckboxForCustomKeyword(self, custom_keyword):
+        checkbox = QCheckBox(custom_keyword)
+        checkbox.setFont(QFont("Roboto", 12))
+        checkbox.stateChanged.connect(self.updateSelectedKeywords)
+        self.predefined_checkboxes.append(checkbox)
+        self.filter_layout.addWidget(checkbox)
+        
     def applyKeywordFilter(self):
         selected_keywords = list(self.selected_keywords)  # Convert set to list
 
         if not selected_keywords:  # If no keywords are selected, show all 12 videos
+            print("No keywords selected. Showing all videos.")
             self.updateVideoList(youtube.search())
         else:
             filtered_videos = [video for video in youtube.search() if any(keyword in video.title.lower() for keyword in selected_keywords)]
+            print(f"Filtered videos: {filtered_videos}")
             self.updateVideoList(filtered_videos)
 
     def updateVideoList(self, filtered_videos):
