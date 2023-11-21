@@ -6,7 +6,7 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 import os
 import requests
 import sqlite3
-
+import pyperclip
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(os.path.join(parent_dir, 'youtube_api'))  # Adds youtube_api to path
@@ -14,6 +14,13 @@ db_path = os.path.join(parent_dir, 'Notes.db')
 import youtube
 
 youtube = youtube.Youtube()
+
+
+def copyURL(id):
+    url = f'https://www.youtube.com/watch?v={id}'
+    pyperclip.copy(url)
+    print("url copied to clipboard")
+    
 
 # adds video widget (thumbnail + title) in collection
 class VideoEntry(QWidget):
@@ -160,7 +167,13 @@ class SplitWindow(QMainWindow):
         splitter2.addWidget(playArea)
         splitter2.addWidget(noteFrame)
         splitter2.setSizes([900, 500])
-        
+        copy_button = QPushButton("Copy URL", self)
+        copy_button.setFont(QFont("Roboto", 12))
+        copy_button.setStyleSheet("background-color: lightblue")
+        copy_button.resize(100,32)
+        copy_button.move(900, 600)
+        copy_button.clicked.connect(lambda: copyURL(id))
+        layout.addWidget(copy_button)
         layout.addWidget(splitter2)
         popup.setLayout(layout)
         popup.exec_()
@@ -232,22 +245,32 @@ class SplitWindow(QMainWindow):
                         widget.deleteLater()
                     i += 1
                     
-                for x in notes:
+                for note in notes:
                     self.textArea = QTextEdit()
                     self.textArea.lineWrapColumnOrWidth = 50
-                    self.textArea.setText(x[0])
+                    self.copyNoteButton = QPushButton("Copy")
+                    self.textArea.setText(note[0])
+                    self.copyNoteButton.clicked.connect(lambda: pyperclip.copy(self.textArea.toPlainText()))
                     self.containerLayout.addWidget(self.textArea)
+                    self.containerLayout.addWidget(self.copyNoteButton)
+                    
             self.textArea = QTextEdit()
             self.textArea.lineWrapColumnOrWidth = 50
             self.containerLayout.addWidget(self.textArea)
             self.saveButton.setText("Save")
+            
         else:
             if notes:
-                for x in notes:
+                for note in notes:
                     self.textArea = QTextEdit()
                     self.textArea.lineWrapColumnOrWidth = 50
-                    self.textArea.setText(x[0])
+                    self.copyNoteButton = QPushButton("Copy")
+                    print(note[0])
                     self.containerLayout.addWidget(self.textArea)
+                    self.textArea.setText(note[0])
+                    self.copyNoteButton.clicked.connect(lambda: pyperclip.copy(self.textArea.toPlainText()))
+                    self.containerLayout.addWidget(self.textArea)
+                    self.containerLayout.addWidget(self.copyNoteButton)
         
         add = False
             
