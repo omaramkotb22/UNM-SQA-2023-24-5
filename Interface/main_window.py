@@ -73,7 +73,16 @@ class SplitWindow(QMainWindow):
         left_layout = QVBoxLayout(left_widget)
         left_widget.setLayout(left_layout)
 
-        title_label = QLabel("Video Collection", left_widget)
+        self.setupFilterSection(left_layout)
+        self.setupVideoCollectionSection(left_layout)
+
+        splitter.addWidget(left_widget)
+        central_layout.addWidget(splitter)
+
+        self.updateVideoList(youtube.search())
+
+    def setupFilterSection(self, layout):
+        title_label = QLabel("Video Collection", self)
         title_label.setFont(QFont("Roboto", 20))
         title_label.setMinimumWidth(650)
         title_label.setAlignment(Qt.AlignCenter)
@@ -101,12 +110,11 @@ class SplitWindow(QMainWindow):
             checkbox.stateChanged.connect(self.updateSelectedKeywords)
             self.predefined_checkboxes.append(checkbox)
             self.filter_layout.addWidget(checkbox)
-         
-       
-        left_layout.addWidget(title_label)
-        left_layout.addWidget(filter_frame)
-        
 
+        layout.addWidget(title_label)
+        layout.addWidget(filter_frame)
+
+    def setupVideoCollectionSection(self, layout):
         line = QFrame()
         line.setFrameShape(QFrame.HLine)
         line.setFrameShadow(QFrame.Sunken)
@@ -118,14 +126,8 @@ class SplitWindow(QMainWindow):
         content_widget = QWidget()
         self.content_layout = QVBoxLayout(content_widget)
         scroll_area.setWidget(content_widget)
-
-        left_layout.addWidget(line)
-        left_layout.addWidget(scroll_area)
-
-        splitter.addWidget(left_widget)
-        central_layout.addWidget(splitter)
-
-        self.updateVideoList(youtube.search())
+        layout.addWidget(line)
+        layout.addWidget(scroll_area)
 
     def addCustomKeyword(self):
         custom_keyword = self.custom_keyword_edit.text().strip()
@@ -134,56 +136,13 @@ class SplitWindow(QMainWindow):
             self.predefined_keywords.append(custom_keyword)
             self.addCheckboxForCustomKeyword(custom_keyword)
 
-    # popup video player (appears when video in collection clicked)
-    def playVideo(self, id):
-        embed_code = f'<iframe width="900" height="600" src="https://www.youtube.com/embed/{id}?hl=en" frameborder="0" allowfullscreen></iframe>'
-        popup = QDialog(self)
-        popup.setWindowTitle("YouTube Video")
-        popup.setMinimumSize(1450, 650)
-        layout = QHBoxLayout(popup)
-        splitter2 = QSplitter(Qt.Horizontal)
-        
-        noteFrame = QFrame()
-        self.noteLayout = QVBoxLayout(noteFrame)
-        label = QLabel("Notepad")
-        label.setFont(QFont("Roboto", 18))
-        self.noteLayout.addWidget(label)
-        
-        self.noteView = QScrollArea()
-        self.noteView.setWidgetResizable(True)
-        self.noteView.setFrameShape(QFrame.NoFrame)
-        self.noteView.setFrameShadow(QFrame.Plain)
-        self.noteContainer = QWidget()
-        self.containerLayout = QVBoxLayout(self.noteContainer)
-        self.noteView.setWidget(self.noteContainer)
-        self.noteLayout.addWidget(self.noteView)
-        self.notesDisplay(self.checkDB(id), False)
-        
-        self.saveButton = QPushButton(noteFrame, text="Save")
-        self.noteLayout.addWidget(self.saveButton)
-        self.saveButton.clicked.connect(lambda: self.saveNote(id, self.saveButton))
-        addButton = QPushButton(noteFrame, text="Add Note")
-        addButton.clicked.connect(lambda: self.notesDisplay(self.checkDB(id), True))
-        self.noteLayout.addWidget(addButton)
-        
-        playArea = QWebEngineView()
-        playArea.setHtml(embed_code)
-        
-        splitter2.addWidget(playArea)
-        splitter2.addWidget(noteFrame)
-        splitter2.setSizes([900, 500])
-        copy_button = QPushButton("Copy URL", self)
-        copy_button.setFont(QFont("Roboto", 12))
-        copy_button.setStyleSheet("background-color: lightblue")
-        copy_button.resize(100,32)
-        copy_button.move(900, 600)
-        copy_button.clicked.connect(lambda: copyURL(id))
-        layout.addWidget(copy_button)
-        layout.addWidget(splitter2)
-        popup.setLayout(layout)
-        popup.exec_()
+    def addCheckboxForCustomKeyword(self, custom_keyword):
+        checkbox = QCheckBox(custom_keyword)
+        checkbox.setFont(QFont("Roboto", 12))
+        checkbox.stateChanged.connect(self.updateSelectedKeywords)
+        self.predefined_checkboxes.append(checkbox)
+        self.filter_layout.addWidget(checkbox)
 
-    # filter video collection based on keywords
     def updateSelectedKeywords(self):
         self.selected_keywords.clear()
 
@@ -194,14 +153,6 @@ class SplitWindow(QMainWindow):
         # Apply the keyword filter
         self.applyKeywordFilter()
 
-    
-    def addCheckboxForCustomKeyword(self, custom_keyword):
-        checkbox = QCheckBox(custom_keyword)
-        checkbox.setFont(QFont("Roboto", 12))
-        checkbox.stateChanged.connect(self.updateSelectedKeywords)
-        self.predefined_checkboxes.append(checkbox)
-        self.filter_layout.addWidget(checkbox)
-        
     def applyKeywordFilter(self):
         selected_keywords = list(self.selected_keywords)  # Convert set to list
 
@@ -223,7 +174,55 @@ class SplitWindow(QMainWindow):
             video_entry = VideoEntry(video)
             video_entry.clicked.connect(self.playVideo)
             self.content_layout.addWidget(video_entry)
-    
+
+    def playVideo(self, id):
+        embed_code = f'<iframe width="900" height="600" src="https://www.youtube.com/embed/{id}?hl=en" frameborder="0" allowfullscreen></iframe>'
+        popup = QDialog(self)
+        popup.setWindowTitle("YouTube Video")
+        popup.setMinimumSize(1450, 650)
+        layout = QHBoxLayout(popup)
+        splitter2 = QSplitter(Qt.Horizontal)
+
+        noteFrame = QFrame()
+        self.noteLayout = QVBoxLayout(noteFrame)
+        label = QLabel("Notepad")
+        label.setFont(QFont("Roboto", 18))
+        self.noteLayout.addWidget(label)
+
+        self.noteView = QScrollArea()
+        self.noteView.setWidgetResizable(True)
+        self.noteView.setFrameShape(QFrame.NoFrame)
+        self.noteView.setFrameShadow(QFrame.Plain)
+        self.noteContainer = QWidget()
+        self.containerLayout = QVBoxLayout(self.noteContainer)
+        self.noteView.setWidget(self.noteContainer)
+        self.noteLayout.addWidget(self.noteView)
+        self.notesDisplay(self.checkDB(id), False)
+
+        self.saveButton = QPushButton(noteFrame, text="Save")
+        self.noteLayout.addWidget(self.saveButton)
+        self.saveButton.clicked.connect(lambda: self.saveNote(id, self.saveButton))
+        addButton = QPushButton(noteFrame, text="Add Note")
+        addButton.clicked.connect(lambda: self.notesDisplay(self.checkDB(id), True))
+        self.noteLayout.addWidget(addButton)
+
+        playArea = QWebEngineView()
+        playArea.setHtml(embed_code)
+
+        splitter2.addWidget(playArea)
+        splitter2.addWidget(noteFrame)
+        splitter2.setSizes([900, 500])
+        copy_button = QPushButton("Copy URL", self)
+        copy_button.setFont(QFont("Roboto", 12))
+        copy_button.setStyleSheet("background-color: lightblue")
+        copy_button.resize(100, 32)
+        copy_button.move(900, 600)
+        copy_button.clicked.connect(lambda: copyURL(id))
+        layout.addWidget(copy_button)
+        layout.addWidget(splitter2)
+        popup.setLayout(layout)
+        popup.exec_()
+
     def checkDB(self, id):
         db = sqlite3.connect(db_path)
         cursor = db.cursor()
@@ -231,7 +230,7 @@ class SplitWindow(QMainWindow):
         result = cursor.fetchall()
         if result:
             return result
-         
+
     def saveNote(self, id, saveButton):
         note = self.textArea.toPlainText()
         try:
@@ -248,44 +247,44 @@ class SplitWindow(QMainWindow):
                 db.close()
 
     def notesDisplay(self, notes, add):
-        if add:
-            if notes:
-                i = 0
-                while i < len(notes):
-                    widget = self.containerLayout.itemAt(i).widget()
-                    if widget:
-                        widget.deleteLater()
-                    i += 1
-                    
-                for note in notes:
-                    self.textArea = QTextEdit()
-                    self.textArea.lineWrapColumnOrWidth = 50
-                    self.copyNoteButton = QPushButton("Copy")
-                    self.textArea.setText(note[0])
-                    self.copyNoteButton.clicked.connect(lambda: pyperclip.copy(self.textArea.toPlainText()))
-                    self.containerLayout.addWidget(self.textArea)
-                    self.containerLayout.addWidget(self.copyNoteButton)
-                    
-            self.textArea = QTextEdit()
-            self.textArea.lineWrapColumnOrWidth = 50
-            self.containerLayout.addWidget(self.textArea)
-            self.saveButton.setText("Save")
-            
-        else:
-            if notes:
-                for note in notes:
-                    self.textArea = QTextEdit()
-                    self.textArea.lineWrapColumnOrWidth = 50
-                    self.copyNoteButton = QPushButton("Copy")
-                    print(note[0])
-                    self.containerLayout.addWidget(self.textArea)
-                    self.textArea.setText(note[0])
-                    self.copyNoteButton.clicked.connect(lambda: pyperclip.copy(self.textArea.toPlainText()))
-                    self.containerLayout.addWidget(self.textArea)
-                    self.containerLayout.addWidget(self.copyNoteButton)
         
-        add = False
-            
+            if add:
+                if notes:
+                    for i in reversed(range(self.containerLayout.count())):
+                        widget = self.containerLayout.itemAt(i).widget()
+                        if widget:
+                            widget.deleteLater()
+
+                    for note in notes:
+                        self.textArea = QTextEdit()
+                        self.textArea.lineWrapColumnOrWidth = 50
+                        self.copyNoteButton = QPushButton("Copy")
+                        self.textArea.setText(note[0])
+                        copylist.append(note[0])
+                        string = note[0]
+                        self.copyNoteButton.clicked.connect(lambda _,s=string : pyperclip.copy(s))
+                        self.containerLayout.addWidget(self.textArea) 
+                        self.containerLayout.addWidget(self.copyNoteButton)
+
+                self.textArea = QTextEdit()
+                self.textArea.lineWrapColumnOrWidth = 50
+                self.containerLayout.addWidget(self.textArea)
+                self.saveButton.setText("Save")
+
+            else:
+                if notes:
+                    for note in notes:
+                        self.textArea = QTextEdit()
+                        self.textArea.lineWrapColumnOrWidth = 50
+                        self.copyNoteButton = QPushButton("Copy")
+                        self.containerLayout.addWidget(self.textArea)
+                        self.textArea.setText(note[0])
+                        string = note[0]
+                        self.copyNoteButton.clicked.connect(lambda _,s=string: pyperclip.copy(s))
+                        self.containerLayout.addWidget(self.textArea)
+                        self.containerLayout.addWidget(self.copyNoteButton)
+            add = False
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
