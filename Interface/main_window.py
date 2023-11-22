@@ -160,9 +160,9 @@ class SplitWindow(QMainWindow):
             print("No keywords selected. Showing all videos.")
             self.updateVideoList(youtube.search())
         else:
-            filtered_videos = [video for video in youtube.search() if any(keyword in video.title.lower() for keyword in selected_keywords)]
-            print(f"Filtered videos: {filtered_videos}")
-            self.updateVideoList(filtered_videos)
+            selected_keywords_string = str(selected_keywords)
+            print(selected_keywords_string)
+            self.updateVideoList(youtube.search(selected_keywords_string))
 
     def updateVideoList(self, filtered_videos):
         for i in reversed(range(self.content_layout.count())):
