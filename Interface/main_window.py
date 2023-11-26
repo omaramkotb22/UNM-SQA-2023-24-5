@@ -176,7 +176,20 @@ class SplitWindow(QMainWindow):
             self.content_layout.addWidget(video_entry)
 
     def playVideo(self, id):
-        embed_code = f'<iframe width="900" height="600" src="https://www.youtube.com/embed/{id}?hl=en" frameborder="0" allowfullscreen></iframe>'
+        embed_code = f'''
+        <!DOCTYPE html>
+            <html>
+            <body>
+            <iframe 
+                width="900" 
+                height="600" 
+                src="https://www.youtube.com/embed/{id}?hl=en" 
+                frameborder="0" 
+                allowfullscreen>
+            </iframe>
+            </body>
+            </html>
+        '''
         popup = QDialog(self)
         popup.setWindowTitle("YouTube Video")
         popup.setMinimumSize(1450, 650)
@@ -206,10 +219,10 @@ class SplitWindow(QMainWindow):
         addButton.clicked.connect(lambda: self.notesDisplay(self.checkDB(id), True))
         self.noteLayout.addWidget(addButton)
 
-        playArea = QWebEngineView()
-        playArea.setHtml(embed_code)
+        self.playArea = QWebEngineView()
+        self.playArea.setHtml(embed_code)
 
-        splitter2.addWidget(playArea)
+        splitter2.addWidget(self.playArea)
         splitter2.addWidget(noteFrame)
         splitter2.setSizes([900, 500])
         copy_button = QPushButton("Copy URL", self)
@@ -260,7 +273,7 @@ class SplitWindow(QMainWindow):
                         self.textArea.lineWrapColumnOrWidth = 50
                         self.copyNoteButton = QPushButton("Copy")
                         self.textArea.setText(note[0])
-                        copylist.append(note[0])
+                        # copylist.append(note[0])
                         string = note[0]
                         self.copyNoteButton.clicked.connect(lambda _,s=string : pyperclip.copy(s))
                         self.containerLayout.addWidget(self.textArea) 
@@ -284,6 +297,21 @@ class SplitWindow(QMainWindow):
                         self.containerLayout.addWidget(self.textArea)
                         self.containerLayout.addWidget(self.copyNoteButton)
             add = False
+
+    def checkVideoTime(self):
+        # Get the current video time (in seconds)
+        script = """
+        var player = document.querySelector('iframe');
+        var currentTime = player.contentWindow.document.querySelector('video').currentTime;
+        currentTime;
+        """
+        self.playArea.page().runJavaScript(script, self.handleVideoTime)
+
+    def handleVideoTime(self, result):
+        # Handle the current video time
+        current_time = int(result)
+        if current_time >= self.event_time_threshold:
+            print(f"Event occurred at {current_time} seconds.")
 
 
 if __name__ == "__main__":
