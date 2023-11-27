@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -14,6 +15,54 @@ db_path = os.path.join(parent_dir, 'Notes.db')
 import youtube
 
 youtube = youtube.Youtube()
+=======
+
+import sys
+
+from PyQt5.QtWidgets import *
+
+from PyQt5.QtGui import *
+
+from PyQt5.QtCore import *
+
+import pyperclip
+
+
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+import os
+import sys
+
+import requests
+
+current_dir = os.path.dirname(os.path.realpath(__file__))
+
+parent_dir = os.path.dirname(current_dir)
+
+sys.path.append(os.path.join(parent_dir, 'youtube_api')) #adds youtube_api to path
+import youtube
+
+
+youtube = youtube.Youtube()
+
+
+# Class for video
+
+# class Video:
+
+#     def __init__(self, image_path, title, video_id):
+
+#         self.image_path = image_path
+
+#         self.title = title
+
+#         self.video_id = video_id
+
+def copyURL(id):
+    url = f'https://www.youtube.com/watch?v={id}'
+    pyperclip.copy(url)
+    print("url copied to clipboard")
+
+>>>>>>> main
 
 
 def copyURL(id):
@@ -24,14 +73,23 @@ def copyURL(id):
 
 # adds video widget (thumbnail + title) in collection
 class VideoEntry(QWidget):
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
     clicked = pyqtSignal(str)
 
     def __init__(self, video):
-        super().__init__()
-        self.video = video
-        self.initUI()
+
+        super().__init__() # Inherits from the constructor of the QWidget class
+
+        self.video = video # Video object
+
+        self.initUI() # Call the initUI method to initialize the user interface
+
 
     def initUI(self):
+
         layout = QHBoxLayout()
         image_label = QLabel(self)
         response = requests.get(self.video.image_path)
@@ -40,12 +98,42 @@ class VideoEntry(QWidget):
         pixmap.loadFromData(image_data)
         image_label.setPixmap(pixmap)
 
+<<<<<<< HEAD
         title_label = QLabel(self.video.title)
         title_label.setFont(QFont("Roboto", 18))
         image_label.mousePressEvent = lambda event: (self.clicked.emit(self.video.video_id))
 
+=======
+        # label for the image
+
+        image_label = QLabel(self) # creates label
+
+        response = requests.get(self.video.image_path) # gets image from url
+
+        image_data = response.content # gets image data
+
+        pixmap = QPixmap()
+
+        pixmap.loadFromData(image_data) #sets image to pixmap
+
+        image_label.setPixmap(pixmap) #sets image to label
+
+        # label for the title
+
+        title_label = QLabel(self.video.title)
+
+        title_label.setFont(QFont("Roboto", 18))
+
+        image_label.mousePressEvent = lambda event: (self.clicked.emit(self.video.video_id))
+
+
+        # Add both the image and title labels to the horizontal layout
+
+>>>>>>> main
         layout.addWidget(image_label)
+
         layout.addWidget(title_label)
+<<<<<<< HEAD
         self.setLayout(layout)
 
 class SplitWindow(QMainWindow):
@@ -54,25 +142,69 @@ class SplitWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.custom_keyword_edit = QLineEdit()
+=======
+
+
+        self.setLayout(layout)
+class MainWindow(QMainWindow):
+
+    #list of videos and their info (filled in by youtube api)
+
+    global videos_list
+
+    videos_list = youtube.search()  #searches for videos with "Software Quality Assurance" in the title
+
+    for video in videos_list:
+
+        print(video.title)
+
+        print(video.video_id)
+
+        print(video.image_path)
+        print()
+
+    def __init__(self):
+
+        super().__init__() # Inherits from the constructor of the QMainWindow class
+
+
+>>>>>>> main
         self.setWindowTitle("Video Player")
+
         self.setGeometry(100, 100, 1920, 1080)
 
+
         central_widget = QWidget(self)
+
         self.setCentralWidget(central_widget)
 
+
         central_layout = QVBoxLayout()
+
         central_widget.setLayout(central_layout)
+
 
         splitter = QSplitter(Qt.Horizontal)
 
+
         left_widget = QWidget(splitter)
+<<<<<<< HEAD
+=======
+
+        # right_widget = QWidget(splitter)
+
+>>>>>>> main
 
         left_widget.setStyleSheet("background-color: lightblue")
+
         left_widget.setMinimumWidth(300)
 
+
         left_layout = QVBoxLayout(left_widget)
+
         left_widget.setLayout(left_layout)
 
+<<<<<<< HEAD
         self.setupFilterSection(left_layout)
         self.setupVideoCollectionSection(left_layout)
 
@@ -84,9 +216,18 @@ class SplitWindow(QMainWindow):
     def setupFilterSection(self, layout):
         title_label = QLabel("Video Collection", self)
         title_label.setFont(QFont("Roboto", 20))
+=======
+
+        title_label = QLabel("Video Collection", left_widget)
+
+        title_label.setFont(QFont("Roboto", 20))
+
+>>>>>>> main
         title_label.setMinimumWidth(650)
+
         title_label.setAlignment(Qt.AlignCenter)
 
+<<<<<<< HEAD
         filter_frame = QFrame()
         filter_frame.setFrameShape(QFrame.StyledPanel)
         self.filter_layout = QVBoxLayout(filter_frame)
@@ -115,20 +256,40 @@ class SplitWindow(QMainWindow):
         layout.addWidget(filter_frame)
 
     def setupVideoCollectionSection(self, layout):
+=======
+
+>>>>>>> main
         line = QFrame()
+
         line.setFrameShape(QFrame.HLine)
+
         line.setFrameShadow(QFrame.Sunken)
 
+
         scroll_area = QScrollArea()
+
         scroll_area.setWidgetResizable(True)
+<<<<<<< HEAD
         scroll_area.setFrameShape(QFrame.NoFrame)
         scroll_area.setFrameShadow(QFrame.Plain)
         content_widget = QWidget()
         self.content_layout = QVBoxLayout(content_widget)
+=======
+
+        scroll_area.setFrameShape(QFrame.NoFrame)  # Set the frame shape to NoFrame
+
+        scroll_area.setFrameShadow(QFrame.Plain) 
+
+        content_widget = QWidget()
+
+        content_layout = QVBoxLayout(content_widget)
+
+>>>>>>> main
         scroll_area.setWidget(content_widget)
         layout.addWidget(line)
         layout.addWidget(scroll_area)
 
+<<<<<<< HEAD
     def addCustomKeyword(self):
         custom_keyword = self.custom_keyword_edit.text().strip()
         if custom_keyword:
@@ -278,6 +439,31 @@ class SplitWindow(QMainWindow):
                         self.copyNoteButton.clicked.connect(lambda _,s=string : pyperclip.copy(s))
                         self.containerLayout.addWidget(self.textArea) 
                         self.containerLayout.addWidget(self.copyNoteButton)
+=======
+
+        # Add videos from youtube search to layout
+
+        for video in videos_list:
+
+            video_entry = VideoEntry(video)
+
+            video_entry.clicked.connect(self.playVideo)
+
+            content_layout.addWidget(video_entry)
+            
+
+
+        left_layout.addWidget(title_label)
+
+        left_layout.addWidget(line)
+
+        left_layout.addWidget(scroll_area)
+
+        splitter.addWidget(left_widget)
+
+        # splitter.addWidget(right_widget)
+
+>>>>>>> main
 
                 self.textArea = QTextEdit()
                 self.textArea.lineWrapColumnOrWidth = 50
@@ -313,9 +499,46 @@ class SplitWindow(QMainWindow):
         if current_time >= self.event_time_threshold:
             print(f"Event occurred at {current_time} seconds.")
 
+<<<<<<< HEAD
+=======
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = SplitWindow()
-    window.showMaximized()
-    sys.exit(app.exec_())
+        central_layout.addWidget(splitter)
+     
+>>>>>>> main
+
+     #embed selected video onto dedicated play area   
+
+    def playVideo(self, id):
+
+            embed_code = f'<iframe width="900" height="600" src="https://www.youtube.com/embed/{id}?hl=en" frameborder="0" allowfullscreen></iframe>'
+
+
+            # Create a popup with a dedicated play area
+
+            popup = QDialog(self)
+
+            popup.setWindowTitle("YouTube Video")
+
+            popup.setMinimumSize(950, 650)
+
+            layout = QVBoxLayout(popup)
+
+            playArea = QWebEngineView()
+
+            playArea.setHtml(embed_code)
+            
+            copy_button = QPushButton("Copy URL", self)
+            copy_button.setFont(QFont("Roboto", 12))
+            copy_button.setStyleSheet("background-color: lightblue")
+            copy_button.resize(100,32)
+            copy_button.move(900, 600)
+            copy_button.clicked.connect(lambda: copyURL(id))
+
+            layout.addWidget(playArea)
+            layout.addWidget(copy_button)
+
+            popup.setLayout(layout)
+
+            popup.exec_()
+            
+

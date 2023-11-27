@@ -1,5 +1,10 @@
 {
+<<<<<<< HEAD
     "python.analysis.extraPaths": [
         "./youtube_api"
+=======
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+>>>>>>> main
     ]
 }
