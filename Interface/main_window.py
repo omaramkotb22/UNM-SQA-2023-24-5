@@ -71,6 +71,7 @@ class SplitWindow(QMainWindow):
 
         self.setGeometry(100, 100, 1920, 1080)
 
+        self.search = youtube.search
 
         central_widget = QWidget(self)
 
