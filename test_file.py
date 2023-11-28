@@ -1,6 +1,8 @@
 import pytest
 from Interface.main_window import SplitWindow
+from Interface.main_window import VideoEntry
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import Qt
 
 @pytest.fixture
 def video_app():
@@ -10,6 +12,47 @@ def video_app():
     yield window
     # Teardown: Close the SplitWindow instance
     window.close()
+
+@pytest.fixture
+def populate_videos(video_app,qtbot):
+    video_collection = getattr(video_app, 'filtered_videos')
+    display = VideoEntry(video_collection)
+    qtbot.addWidget(display)
+    return display
+
+#------------------------------------------------------------------------------------------------------------
+
+# Requirement 1.1
+# Check that there are 12 videos displayed when app is launched   
+def test_video_collection(video_app):
+    assert video_app is not None
+    video_collection = getattr(video_app, 'filtered_videos')
+    assert len(video_collection) == 12
+
+#------------------------------------------------------------------------------------------------------------
+
+# Requirement 1.2
+# Check if the displayed videos have thumbnails and titles
+def test_collection_display(video_app):
+    assert video_app is not None
+    video_collection = getattr(video_app, 'filtered_videos')
+    for video in video_collection:
+        assert VideoEntry(video).image_label is not None
+        assert VideoEntry(video).title_label is not None
+
+#------------------------------------------------------------------------------------------------------------
+
+# Requirement 2.1
+# Clicking the aforementioned thumbnail must diplay videoplayer
+def test_video_play(populate_videos, video_app, qtbot):
+    assert populate_videos is not None
+    qtbot.mouseClick(populate_videos.image_label, Qt.LeftButton)
+    assert video_app.playVideo is True
+
+#------------------------------------------------------------------------------------------------------------
+
+# Requirement 2.2
+# Check if the video player has pause, play, and back/next buttons
 
 
 #------------------------------------------------------------------------------------------------------------
