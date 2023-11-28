@@ -11,6 +11,9 @@ def video_app():
     # Teardown: Close the SplitWindow instance
     window.close()
 
+
+#------------------------------------------------------------------------------------------------------------
+
 # Requirement 3.1
 # Check if the predefined keywords exists when app is launched
 def test_predefined_keywords_exists(video_app):
@@ -26,7 +29,7 @@ def test_predefined_keywords_exists(video_app):
     assert len(predefined_keywords) > 0
 
 
-
+#------------------------------------------------------------------------------------------------------------
 
 # Requirement 3.2.1
 # Simulate interaction with checkboxes
@@ -67,7 +70,7 @@ def test_update_video_list_based_on_keywords(video_app):
     # Check if the list of videos is updated based on the selected keywords
     assert initial_video_list != updated_video_list
 
-
+#------------------------------------------------------------------------------------------------------------
 
 
 
@@ -95,6 +98,28 @@ def test_add_empty_custom_keyword(video_app):
 
     # Check if an empty custom_keyword is not added to the predefined_keywords
     assert "" not in video_app.predefined_keywords
+
+#------------------------------------------------------------------------------------------------------------
+
+#Requirement xyz
+def test_notes_exist_for_video(video_app):
+    # Check if the SplitWindow instance is created properly
+    assert video_app is not None
+
+    # Replace 'video_id_to_test' with the actual video ID you want to test
+    video_id_to_test = 'xtQpNdGK6WI'
+
+    # Now check if notes attribute is available for the specific video
+    notes_for_video = video_app.checkDB(video_id_to_test)
+
+    # Assert that notes_for_video is not None and has at least one note
+    assert notes_for_video is not None, f"No notes found for video ID: {video_id_to_test}"
+    assert len(notes_for_video) > 0, f"No notes found for video ID: {video_id_to_test}"
+
+    # Check that all notes are strings
+    assert all(isinstance(note[0], str) for note in notes_for_video), "Notes should be strings"
+
+
 
 if __name__ == "__main__":
     pytest.main()
