@@ -196,15 +196,16 @@ class SplitWindow(QMainWindow):
             self.updateVideoList(youtube.search(selected_keywords_string))
 
     def updateVideoList(self, filtered_videos):
+        self.filtered_videos = filtered_videos
         for i in reversed(range(self.content_layout.count())):
             widget = self.content_layout.itemAt(i).widget()
             if widget:
                 widget.deleteLater()
 
-        for video in filtered_videos:
-            video_entry = VideoEntry(video)
-            video_entry.clicked.connect(self.playVideo)
-            self.content_layout.addWidget(video_entry)
+        for video in self.filtered_videos:
+            self.video_entry = VideoEntry(video)
+            self.video_entry.clicked.connect(self.playVideo)
+            self.content_layout.addWidget(self.video_entry)
 
     def playVideo(self, id):
         embed_code = f'''
@@ -221,10 +222,10 @@ class SplitWindow(QMainWindow):
             </body>
             </html>
         '''
-        popup = QDialog(self)
-        popup.setWindowTitle("YouTube Video")
-        popup.setMinimumSize(1450, 650)
-        layout = QHBoxLayout(popup)
+        self.popup = QDialog(self)
+        self.popup.setWindowTitle("YouTube Video")
+        self.popup.setMinimumSize(1450, 650)
+        layout = QHBoxLayout(self.popup)
         splitter2 = QSplitter(Qt.Horizontal)
 
         noteFrame = QFrame()
@@ -264,8 +265,9 @@ class SplitWindow(QMainWindow):
         copy_button.clicked.connect(lambda: copyURL(id))
         layout.addWidget(copy_button)
         layout.addWidget(splitter2)
-        popup.setLayout(layout)
-        popup.exec_()
+        self.popup.setLayout(layout)
+        self.popup.exec_()
+        pass
 
     def checkDB(self, id):
         db = sqlite3.connect(db_path)
