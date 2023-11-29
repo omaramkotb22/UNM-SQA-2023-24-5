@@ -78,7 +78,7 @@ def test_predefined_keywords_exists(video_app: SplitWindow):
 
 #------------------------------------------------------------------------------------------------------------
 
-# Requirement 3.2.1
+# Requirement 3.2
 # Simulate interaction with checkboxes
 @pytest.mark.parametrize("selected_keywords", [["explained"], ["tutorial", "demo"], []])
 def test_select_deselect_keywords(video_app: SplitWindow, selected_keywords: list[str] | list[object]):
@@ -94,7 +94,7 @@ def test_select_deselect_keywords(video_app: SplitWindow, selected_keywords: lis
     assert set(video_app.selected_keywords) == set(selected_keywords)
 
 
-# Requirement 3.2.2 - Additional Test
+# Requirement 3.2 - continued
 # Check if the video list is updated based on the selected keywords
 def test_update_video_list_based_on_keywords(video_app: SplitWindow):
     
@@ -120,8 +120,7 @@ def test_update_video_list_based_on_keywords(video_app: SplitWindow):
 #------------------------------------------------------------------------------------------------------------
 
 
-
-# Requirement 3.3.1
+# Requirement 3.3
 # Simulate user adding a new custom keyword
 @pytest.mark.parametrize("custom_keyword", ["CS2", "CSGO"])
 def test_add_custom_keyword(video_app: SplitWindow, custom_keyword: Literal['CS2', 'CSGO']):
@@ -134,8 +133,7 @@ def test_add_custom_keyword(video_app: SplitWindow, custom_keyword: Literal['CS2
     # Check if the custom_keyword is added to the predefined_keywords
     assert custom_keyword in video_app.predefined_keywords
 
-#  Requirement 3.3.2
-#  Additional Test for Empty Custom Keyword
+# Requirement 3.3 - Additional Test for Empty Custom Keyword
 def test_add_empty_custom_keyword(video_app: SplitWindow):
     # Set the custom_keyword_edit to an empty string
     video_app.custom_keyword_edit.setText("")
