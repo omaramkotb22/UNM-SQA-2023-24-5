@@ -272,7 +272,6 @@ class SplitWindow(QMainWindow):
         layout.addWidget(splitter2)
         self.popup.setLayout(layout)
         self.popup.exec_()
-        pass
 
     def checkDB(self, id):
         db = sqlite3.connect(db_path)

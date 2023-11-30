@@ -5,6 +5,7 @@ from Interface.main_window import SplitWindow
 from Interface.main_window import VideoEntry
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtTest import QTest
 
 @pytest.fixture
 def video_app():
@@ -38,13 +39,15 @@ def test_collection_display(video_app: SplitWindow):
 #------------------------------------------------------------------------------------------------------------
 
 # Requirement 2.1
-# Clicking the aforementioned thumbnail must diplay videoplayer -------- Note: passes (when run individually) but does not automatically  close gui (cuases segmentation fault)
+# Clicking the aforementioned thumbnail must diplay videoplayer -------- Note: fails but still emits the playArea poopup (popup needs to be manually closed)
 def test_video_play(video_app: SplitWindow):
-    if video_app.video_entry.clicked.emit('xtQpNdGK6WI'):
-        video_app.close()
-        pass
+    video_collection = getattr(video_app, 'filtered_videos')
+    video_entry = VideoEntry(video_collection[0])
+    assert video_entry.clicked.hasHandlers()
+    QTest.mouseClick(video_entry, Qt.LeftButton)
+    assert video_app.playVideo
+        
     
-
 #------------------------------------------------------------------------------------------------------------
 
 # Requirement 2.2
