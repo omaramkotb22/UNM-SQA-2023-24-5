@@ -7,7 +7,7 @@ class Video:
         self.video_id = video_id
 
 class Youtube:
-    def __init__(self, api_key="AIzaSyDdJBl_eHOaJ_IoCRLUfuQ_-U03DTGIRAE"):
+    def __init__(self, api_key="AIzaSyDf7n_mcNuaSoDTrr5Iz1FMTurMl-WqDb8"):
         self.api_key = api_key
         self.youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
 

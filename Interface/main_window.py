@@ -208,6 +208,7 @@ class SplitWindow(QMainWindow):
             self.content_layout.addWidget(self.video_entry)
 
     def playVideo(self, id):
+        self.vid_id = id    #used in the delete function
         embed_code = f'''
         <!DOCTYPE html>
             <html>
@@ -225,7 +226,7 @@ class SplitWindow(QMainWindow):
         self.popup = QDialog(self)
         self.popup.setWindowTitle("YouTube Video")
         self.popup.setMinimumSize(1450, 650)
-        layout = QHBoxLayout(self.popup)
+        layout = QVBoxLayout(self.popup)
         splitter2 = QSplitter(Qt.Horizontal)
 
         noteFrame = QFrame()
@@ -242,6 +243,7 @@ class SplitWindow(QMainWindow):
         self.containerLayout = QVBoxLayout(self.noteContainer)
         self.noteView.setWidget(self.noteContainer)
         self.noteLayout.addWidget(self.noteView)
+        self.delete = False
         self.notesDisplay(self.checkDB(id), False)
 
         self.saveButton = QPushButton(noteFrame, text="Save")
@@ -251,19 +253,22 @@ class SplitWindow(QMainWindow):
         addButton.clicked.connect(lambda: self.notesDisplay(self.checkDB(id), True))
         self.noteLayout.addWidget(addButton)
 
-        self.playArea = QWebEngineView()
-        self.playArea.setHtml(embed_code)
-
-        splitter2.addWidget(self.playArea)
-        splitter2.addWidget(noteFrame)
-        splitter2.setSizes([900, 500])
-        copy_button = QPushButton("Copy URL", self)
+        copy_button = QPushButton("Copy Video URL", self)
         copy_button.setFont(QFont("Roboto", 12))
-        copy_button.setStyleSheet("background-color: lightblue")
+        copy_button.setStyleSheet("background-color: grey")
         copy_button.resize(100, 32)
         copy_button.move(900, 600)
         copy_button.clicked.connect(lambda: copyURL(id))
-        layout.addWidget(copy_button)
+        videoGroup = QWidget()
+        groupLayout = QVBoxLayout(videoGroup)
+        self.playArea = QWebEngineView()
+        self.playArea.setHtml(embed_code)
+        groupLayout.addWidget(self.playArea)
+        groupLayout.addWidget(copy_button)
+
+        splitter2.addWidget(videoGroup)
+        splitter2.addWidget(noteFrame)
+        splitter2.setSizes([900, 500])
         layout.addWidget(splitter2)
         self.popup.setLayout(layout)
         self.popup.exec_()
@@ -291,6 +296,22 @@ class SplitWindow(QMainWindow):
         finally:
             if db:
                 db.close()
+    
+    def deleteNote(self, id, note):
+        delete = str(note)
+        try:
+            db = sqlite3.connect(db_path)
+            cursor = db.cursor()
+            cursor.execute('delete from Video_Notes where Note = ?', (delete,))
+            db.commit()
+            cursor.close()
+
+        finally:
+            if db:
+                db.close()
+        
+        self.delete = True        
+        self.notesDisplay(self.checkDB(id), False)
 
     def notesDisplay(self, notes, add):
         
@@ -302,33 +323,67 @@ class SplitWindow(QMainWindow):
                             widget.deleteLater()
 
                     for note in notes:
+                        self.noteGroup = QWidget(self.noteContainer)
+                        self.groupLayout = QHBoxLayout(self.noteGroup)
                         self.textArea = QTextEdit()
                         self.textArea.lineWrapColumnOrWidth = 50
                         self.copyNoteButton = QPushButton("Copy")
+                        self.deleteNoteButton = QPushButton("Delete")
                         self.textArea.setText(note[0])
                         # copylist.append(note[0])
                         string = note[0]
                         self.copyNoteButton.clicked.connect(lambda _,s=string : pyperclip.copy(s))
-                        self.containerLayout.addWidget(self.textArea) 
-                        self.containerLayout.addWidget(self.copyNoteButton)
+                        self.deleteNoteButton.clicked.connect(lambda checked, n=note: self.deleteNote(self.vid_id,n[0]))
+                        print("Note", note)
+                        self.groupLayout.addWidget(self.textArea) 
+                        self.groupLayout.addWidget(self.copyNoteButton)
+                        self.groupLayout.addWidget(self.deleteNoteButton)
+                        self.containerLayout.addWidget(self.noteGroup)
 
+                self.noteGroup = QWidget(self.noteContainer)
+                self.groupLayout = QHBoxLayout(self.noteGroup)
                 self.textArea = QTextEdit()
                 self.textArea.lineWrapColumnOrWidth = 50
-                self.containerLayout.addWidget(self.textArea)
+                self.copyNoteButton = QPushButton("Copy")
+                self.deleteNoteButton = QPushButton("Delete")
+                if notes: 
+                    string = notes[0]
+                    self.copyNoteButton.clicked.connect(lambda _,s=string : pyperclip.copy(s))
+                    self.deleteNoteButton.clicked.connect(lambda checked, n=note: self.deleteNote(self.vid_id,n[0]))
+                    print("Note", note)
+                self.groupLayout.addWidget(self.textArea)
+                self.groupLayout.addWidget(self.copyNoteButton)
+                self.groupLayout.addWidget(self.deleteNoteButton)
+                self.containerLayout.addWidget(self.noteGroup)
+            
                 self.saveButton.setText("Save")
 
             else:
                 if notes:
+                    if self.delete:
+                        for i in reversed(range(self.containerLayout.count())):
+                            widget = self.containerLayout.itemAt(i).widget()
+                            if widget:
+                                widget.deleteLater()
+                            
                     for note in notes:
+                        self.noteGroup = QWidget(self.noteContainer)
+                        self.groupLayout = QHBoxLayout(self.noteGroup)
                         self.textArea = QTextEdit()
                         self.textArea.lineWrapColumnOrWidth = 50
                         self.copyNoteButton = QPushButton("Copy")
+                        self.deleteNoteButton = QPushButton("Delete")
                         self.containerLayout.addWidget(self.textArea)
                         self.textArea.setText(note[0])
                         string = note[0]
+                        print(type(note[0]))
                         self.copyNoteButton.clicked.connect(lambda _,s=string: pyperclip.copy(s))
-                        self.containerLayout.addWidget(self.textArea)
-                        self.containerLayout.addWidget(self.copyNoteButton)
+                        self.deleteNoteButton.clicked.connect(lambda checked, n=note: self.deleteNote(self.vid_id,n[0]))
+                        
+                        self.groupLayout.addWidget(self.textArea) 
+                        self.groupLayout.addWidget(self.copyNoteButton)
+                        self.groupLayout.addWidget(self.deleteNoteButton)
+                        self.containerLayout.addWidget(self.noteGroup)
             add = False
 
     def checkVideoTime(self):

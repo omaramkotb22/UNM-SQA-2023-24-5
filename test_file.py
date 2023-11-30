@@ -40,9 +40,9 @@ def test_collection_display(video_app: SplitWindow):
 # Requirement 2.1
 # Clicking the aforementioned thumbnail must diplay videoplayer -------- Note: passes (when run individually) but does not automatically  close gui (cuases segmentation fault)
 def test_video_play(video_app: SplitWindow):
-        if video_app.video_entry.clicked.emit('xtQpNdGK6WI'):
-            video_app.close()
-            pass
+    if video_app.video_entry.clicked.emit('xtQpNdGK6WI'):
+        video_app.close()
+        pass
     
 
 #------------------------------------------------------------------------------------------------------------
